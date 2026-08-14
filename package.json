@@ -1,0 +1,217 @@
+{
+  "name": "chinese-name-converter",
+  "displayName": "中文命名转换",
+  "description": "将中文快速翻译并转换为 camelCase、PascalCase、snake_case、匈牙利命名法等英文名称。",
+  "version": "0.4.0",
+  "publisher": "local-dev",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "中文",
+    "翻译",
+    "命名",
+    "camelCase",
+    "Hungarian notation"
+  ],
+  "activationEvents": [
+    "onCommand:chineseNameConverter.convert",
+    "onCommand:chineseNameConverter.convertWithStyle"
+  ],
+  "main": "./out/src/extension.js",
+  "scripts": {
+    "compile": "node ./node_modules/typescript/bin/tsc -p ./",
+    "watch": "node ./node_modules/typescript/bin/tsc -w -p ./",
+    "test": "npm run compile && node out/test/core.test.js",
+    "package": "node ./node_modules/@vscode/vsce/vsce package"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "chineseNameConverter.convert",
+        "title": "转换中文为英文名称",
+        "category": "中文命名转换",
+        "icon": "$(symbol-variable)"
+      },
+      {
+        "command": "chineseNameConverter.convertWithStyle",
+        "title": "选择命名风格并转换",
+        "category": "中文命名转换"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "chineseNameConverter.convert",
+        "key": "tab",
+        "when": "editorTextFocus && editorHasSelection && !editorReadonly"
+      },
+      {
+        "command": "chineseNameConverter.convert",
+        "key": "ctrl+alt+n",
+        "mac": "cmd+alt+n",
+        "when": "editorTextFocus && !editorReadonly"
+      },
+      {
+        "command": "chineseNameConverter.convertWithStyle",
+        "key": "ctrl+alt+shift+n",
+        "mac": "cmd+alt+shift+n",
+        "when": "editorTextFocus && !editorReadonly"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "chineseNameConverter.convert",
+          "group": "1_modification@20"
+        },
+        {
+          "command": "chineseNameConverter.convertWithStyle",
+          "group": "1_modification@21"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "中文命名转换",
+      "properties": {
+        "chineseNameConverter.defaultStyle": {
+          "type": "string",
+          "enum": [
+            "camelCase",
+            "PascalCase",
+            "snake_case",
+            "UPPER_SNAKE_CASE",
+            "kebab-case",
+            "Hungarian"
+          ],
+          "enumDescriptions": [
+            "例如 userName",
+            "例如 UserName",
+            "例如 user_name",
+            "例如 USER_NAME",
+            "例如 user-name",
+            "带类型前缀，例如 strUserName"
+          ],
+          "default": "camelCase",
+          "description": "Tab 和直接转换命令使用的命名风格；通过“选择命名风格并转换”选择后会全局保存。"
+        },
+        "chineseNameConverter.translationProvider": {
+          "type": "string",
+          "enum": [
+            "myMemory",
+            "libreTranslate",
+            "offline"
+          ],
+          "enumDescriptions": [
+            "免配置的在线翻译（所选文字会发送到 MyMemory）",
+            "使用自建或第三方 LibreTranslate 服务",
+            "仅使用内置开发词典，不发送数据"
+          ],
+          "default": "myMemory",
+          "description": "中文翻译服务。在线服务会接收待转换文字。"
+        },
+        "chineseNameConverter.libreTranslate.endpoint": {
+          "type": "string",
+          "default": "http://localhost:5000/translate",
+          "description": "LibreTranslate 的 /translate 接口地址。"
+        },
+        "chineseNameConverter.libreTranslate.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "LibreTranslate API 密钥（服务不要求时留空）。"
+        },
+        "chineseNameConverter.hungarian.defaultType": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "string",
+            "number",
+            "boolean",
+            "array",
+            "object",
+            "function",
+            "promise",
+            "element",
+            "map",
+            "set",
+            "date",
+            "uint8",
+            "uint16",
+            "uint32",
+            "uint64",
+            "int8",
+            "int16",
+            "int32",
+            "int64",
+            "float32",
+            "float64",
+            "pointer",
+            "struct",
+            "structPointer",
+            "handle",
+            "enum",
+            "unknown"
+          ],
+          "default": "auto",
+          "description": "直接使用匈牙利命名法时的类型；auto 会根据当前代码推断。"
+        },
+        "chineseNameConverter.hungarian.prefixes": {
+          "type": "object",
+          "default": {
+            "string": "str",
+            "number": "n",
+            "boolean": "b",
+            "array": "arr",
+            "object": "obj",
+            "function": "fn",
+            "promise": "p",
+            "element": "el",
+            "map": "map",
+            "set": "set",
+            "date": "dt",
+            "uint8": "u8",
+            "uint16": "u16",
+            "uint32": "u32",
+            "uint64": "u64",
+            "int8": "s8",
+            "int16": "s16",
+            "int32": "s32",
+            "int64": "s64",
+            "float32": "f32",
+            "float64": "f64",
+            "pointer": "p",
+            "struct": "st",
+            "structPointer": "pst",
+            "handle": "h",
+            "enum": "e",
+            "unknown": "v"
+          },
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "匈牙利命名法的类型前缀映射。"
+        },
+        "chineseNameConverter.showPreview": {
+          "type": "boolean",
+          "default": false,
+          "description": "替换前允许编辑转换结果；多光标时不显示。"
+        },
+        "chineseNameConverter.fallbackToOffline": {
+          "type": "boolean",
+          "default": true,
+          "description": "在线翻译失败时使用内置词典继续转换。"
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.6.0",
+    "typescript": "^5.9.0"
+  }
+}
